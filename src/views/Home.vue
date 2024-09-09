@@ -1,8 +1,13 @@
 <script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 import Navbar from "@/components/Navbar.vue";
 import Footer from "@/components/Footer.vue";
-import axios from "axios";
-import { ref, onMounted } from 'vue';
+import '@fortawesome/fontawesome-free/css/all.css';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import 'swiper/swiper-bundle.css';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const business_name = ref('');
 const business_desc = ref('');
@@ -14,563 +19,443 @@ const business_notelp = ref('');
 const business_email = ref('');
 const business_link_wa = ref('');
 
-const uuid_team = ref('');
-const team_name = ref('');
-const team_job_desc = ref('');
-const team_business = ref(''); // Add this line
-const team_scope = ref(''); // Add this line
+const teamMembers = ref([]);
+const scopes = ref([]);
+const galleryImages = ref([]);
+const priceList = ref([]);
 
 const getDetailUuid = async (uuidBisnis) => {
-    try {
-        const response = await axios.get(`http://localhost:9900/api/v1/business/${uuidBisnis}`);
-        console.log('IKI DATA E', response)
-        if (response && response.data && response.data.data) {
-            const businessData = response.data.data;
-            business_name.value = businessData.business_name;
-            business_desc.value = businessData.business_desc;
-            business_province.value = businessData.business_province;
-            business_regency.value = businessData.business_regency;
-            business_subdistrict.value = businessData.business_subdistrict;
-            business_address.value = businessData.business_address;
-            business_notelp.value = businessData.business_notelp;
-            business_email.value = businessData.business_email;
-            business_link_wa.value = businessData.business_link_wa;
-        }
-    } catch (error) {
-        console.error('Error saat mengedit data:', error);
+  try {
+    const response = await axios.get(`http://localhost:9900/api/v1/business/${uuidBisnis}`);
+    if (response && response.data && response.data.data) {
+      const businessData = response.data.data;
+      business_name.value = businessData.business_name;
+      business_desc.value = businessData.business_desc;
+      business_province.value = businessData.business_province;
+      business_regency.value = businessData.business_regency;
+      business_subdistrict.value = businessData.business_subdistrict;
+      business_address.value = businessData.business_address;
+      business_notelp.value = businessData.business_notelp;
+      business_email.value = businessData.business_email;
+      business_link_wa.value = businessData.business_link_wa;
     }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
 };
+
+const fetchScopeData = async (uuidBisnis) => {
+  try {
+    const response = await axios.get(`http://localhost:9900/api/v1/scope_business/${uuidBisnis}`);
+    if (response && response.data && response.data.data) {
+      scopes.value = response.data.data.data; // Log the response
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
+const fetchTeamsData = async (uuidBisnis) => {
+  try {
+    const response = await axios.get(`http://localhost:9900/api/v1/teams_business/${uuidBisnis}`);
+    if (response && response.data && response.data.data) {
+      teamMembers.value = response.data.data.map((team) => ({
+        name: team.team_name,
+        position: team.team_job_desc,
+        image_url: team.team_media ? team.team_media.media_url : 'https://via.placeholder.com/150',
+      }));
+    }
+  } catch (error) {
+    console.error('Error fetching teams data:', error);
+  }
+};
+
+const fetchTncData = async (uuidBisnis) => {
+  try {
+    const response = await axios.get(`http://localhost:9900/api/v1/tnc_business/${uuidBisnis}`);
+    if (response && response.data && response.data.data) {
+      priceList.value = response.data.data.map((price) => ({
+        name: price.tnc_uuid_table.price_list_name,
+        description: price.tnc_uuid_table.price_list_desc,
+        price: price.tnc_uuid_table.price_list_price,
+        media_url: price.tnc_uuid_table.price_list_media ? price.tnc_uuid_table.price_list_media.media_url : 'https://via.placeholder.com/150',
+      }));
+    }
+  } catch (error) {
+    console.error('Error fetching teams data:', error);
+  }
+};
+
+const fetchGalleryData = async (uuidBisnis) => {
+  try {
+    const response = await axios.get(`http://localhost:9900/api/v1/galleries_business/${uuidBisnis}`);
+    if (response && response.data && response.data.data) {
+      galleryImages.value = response.data.data[0].gallery_media.map(media => ({
+        url: media.media_url,
+        title: media.media_name,
+      }));
+    }
+  } catch (error) {
+    console.error('Error fetching gallery data:', error);
+  }
+};
+
 onMounted(async () => {
-    const uuidBisnis = 'c6fca3f5-eda0-43da-8da2-79d3a36bb19b';
-    await getDetailUuid(uuidBisnis);
+  const uuidBisnis = '97214164-920a-4ac7-8d53-538fd535f36a';
+  await getDetailUuid(uuidBisnis);
+  await fetchScopeData(uuidBisnis);
+  await fetchTeamsData(uuidBisnis);
+  await fetchTncData(uuidBisnis);
+  await fetchGalleryData(uuidBisnis);
+
+  AOS.init();
+
+  console.log("data", scopes.value);
 });
+
+
 </script>
-
-
 
 <template>
   <Navbar />
-<v-main>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="12">
-        <v-row>
-          <v-col cols="12" sm="6">
-            <h1 class="title1"> {{ business_name }}
-              <!-- It's A Big World<br />
-              Out There, Go <br />Explore -->
-            </h1>
-            <p class="par1"> {{ business_desc }}
-              <!-- Conveniently customiz proactiv web service for<br />
-                  leveraged without continualliery aggregate fricctionle
-                  <br />ou wellies richard.and very customize continually. -->
-            </p>
-            <v-btn class="text-noe mt-8 bt1" color="indigo-lighten-1" size="x-large" variant="flat" rounded="0">
-              Get Exploration
-            </v-btn>
-            <v-btn class="text-none ml-2 text-indigo-lighten-1 mt-8" size="x-large" variant="flat" rounded="0">
-              Read More
-            </v-btn>
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-img src="/13.png" class="img1"></v-img>
-          </v-col>
-        </v-row>
-      </v-col>
-      <v-col cols="12" sm="12">
-        <v-card flat>
-          <v-tabs v-model="tab" color="indigo-lighten-1" align-tabs="center">
-          <v-tab :value="1">
-          <v-icon class="mr-2">mdi mdi-bed</v-icon>consultation
-          </v-tab>
-          <v-tab :value="2">
-          <v-icon class="mr-2">mdi mdi-bed</v-icon>Check Dental Health
-          </v-tab>
-          <v-tab :value="3">
-          <v-icon class="mr-2">mdi mdi-bed</v-icon>Emergency measures
-          </v-tab>
-          <v-tab :value="4">
-          <v-icon class="mr-2">mdi mdi-bed</v-icon>Install braces
-          </v-tab>
-        </v-tabs>
-        <v-window v-model="tab">
-        <v-window-item v-for="n in 4" :key="n" :value="n">
-          <v-container fluid>
-            <v-row justify="center" align="center">
-              <v-col cols="12" sm="2">
-                <div class="text-subtile-1 text-medium-emphasis">Select Hospital</div>
-                <v-select density="compact" placeholder="Destination"  :items="[
-                            'Fortis Memorial Research Institute',
-                            'Mega Medipol University Hospital',
-                            'Pusat Medis Teknon - Grup Quironsalud',
-                            'Gleneagles Medini Hospital',
-                            'Dar Al Fouad Hospital',
-                            'HELIOS Hospital Berlin-Buch',
-                          ]"
-                          variant="outlined"></v-select>
-              </v-col>
-              <v-col cols="12" sm="2">
-                <div class="text-subtile-1 text-medium-emphasis">Select a date</div>
-                <v-text-field density="compact" placeholder="Date" type="date" variant="outlined"></v-text-field>
-              </v-col>
-              <!-- <v-col cols="12" sm="2">
-                <div class="text-subtile-1 text-medium-emphasis">Check out</div>
-                <v-text-field density="compact" placeholder="Date" type="date" variant="outlined"></v-text-field>
-              </v-col> -->
-              <v-col cols="12" sm="2">
-                <div class="text-subtile-1 text-medium-emphasis">Specialist</div>
-                <v-select density="compact" placeholder="Specialist"  :items="[
-                            'Periodonsia specialist',
-                            'Orthodontist specialist',
-                            'Oral disease specialist',
-                            'Dental conservation specialist',
-                            'Paediatric dentistry specialist',
-                            'Oral surgery specialist',
-                          ]"
-                          variant="outlined"></v-select>
-              </v-col>
-              <v-col cols="12" sm="2">
-                <div class="text-subtile-1 text-medium-emphasis">Types of treatment</div>
-                <v-select density="compact" placeholder="Types of treatment"  :items="[
-                            'Scaling',
-                            'Sealant',
-                            'Tooth fillings',
-                            'Root canal treatment',
-                            'Tooth extraction',
-                            'Fitting of dentures',
-                          ]"
-                          variant="outlined"></v-select>
-              </v-col>
-              <v-col cols="12" sm="2">
-                <v-btn class="text-none mt-5" color="indigo-lighten-1" size="x-large" variant="flat" rounded="0" elevation="12">
-                  Schedule Now
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-window-item>
-      </v-window>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="12">
-        <h1 class="text-center">Best Doctor Arround The World</h1>
-        <v-row justify="center">
-          <v-col cols="12" sm="10">
-            <v-row>
-              <v-col cols="12" sm="4">
-                <v-hover v-slot="{ isHovering, props}">
-                  <v-card :elevation="isHovering ? 12: 2" :class="{ 'on-hover':isHovering }" v-bind="props" class="card1">
-                  <v-img src="/1.jpg" cover height="100%">
-                    <div class="d-flex flex-row-reverse">
-                      <v-btn class="text-none mr-2 mt-2" color="indigo-lighten-1" size="x-large" variant="flat" rounded="0" elevation="12">
-                        Already
-                      </v-btn>
-                    </div>
-                    <div class="text-black top">
-                      <h1 class="mt-4">Dr.Angela Petrenko</h1>
-                      <div>
-                        <p class="ma-0 text-body-1 font-weight-bold">Starting From $1200</p>
-                      </div>
-                    </div>
-                    <div class="d-flex justify-center">
-                      <v-btn v-for="(icon, index) in icons" :key="index" variant="text" :class="{ 'show-btns' : isHovering}" :color="transparent" :icon="icon"></v-btn>
-                    </div>
-                  </v-img>
-                  </v-card>
-                </v-hover>
-              </v-col>
-              <v-col cols="4" class="d-flex flex-column">
-                <v-row>
-                  <v-col cols="12" sm="12">
-                    <v-hover v-slot="{ isHovering, props}">
-                  <v-card :elevation="isHovering ? 12: 2" :class="{ 'on-hover':isHovering }" v-bind="props" class="card1">
-                  <v-img src="/13.jpg" cover height="100%">
-                    <div class="d-flex flex-row-reverse">
-                      <v-btn class="text-none mr-2 mt-2" color="indigo-lighten-1" size="x-large" variant="flat" rounded="0" elevation="12">
-                        Already
-                      </v-btn>
-                    </div>
-                    <div class="text-black top ">
-                      <h1 class="mt-10 ml-4">Dr.Olga Tkachenko</h1>
-                      <div>
-                        <p class="ma-0 text-body-1 font-weight-bold ml-4">Starting From $1900</p>
-                      </div>
-                    </div>
-                    <div class="d-flex justify-center">
-                      <v-btn v-for="(icon, index) in icons" :key="index" variant="text" :class="{ 'show-btns' : isHovering}" :color="transparent" :icon="icon"></v-btn>
-                    </div>
-                  </v-img>
-                  </v-card>
-                </v-hover>
-                  </v-col>
-                  <v-col cols="12" sm="12">
-                    <v-hover v-slot="{ isHovering, props}">
-                  <v-card :elevation="isHovering ? 12: 2" :class="{ 'on-hover':isHovering }" v-bind="props" class="card1">
-                  <v-img src="/14.jpg" cover height="100%">
-                    <div class="d-flex flex-row-reverse">
-                      <v-btn class="text-none mr-2 mt-2" color="indigo-lighten-1" size="x-large" variant="flat" rounded="0" elevation="12">
-                        Already
-                      </v-btn>
-                    </div>
-                    <div class="text-black top ">
-                      <h1 class="mt-10 ml-4">Dr Stephanie Grossman</h1>
-                      <div>
-                        <p class="ma-0 text-body-1 font-weight-bold ml-4">Starting From $1500</p>
-                      </div>
-                    </div>
-                    <div class="d-flex justify-center">
-                      <v-btn v-for="(icon, index) in icons" :key="index" variant="text" :class="{ 'show-btns' : isHovering}" :color="transparent" :icon="icon"></v-btn>
-                    </div>
-                  </v-img>
-                  </v-card>
-                </v-hover>
-                  </v-col>
-                </v-row>
-              </v-col>
-              <v-col cols="12" sm="4">
-                <v-hover v-slot="{ isHovering, props}">
-                  <v-card :elevation="isHovering ? 12: 2" :class="{ 'on-hover':isHovering }" v-bind="props" class="card1">
-                  <v-img src="/2.jpg" cover height="100%">
-                    <div class="d-flex flex-row-reverse">
-                      <v-btn class="text-none mr-2 mt-2" color="indigo-lighten-1" size="x-large" variant="flat" rounded="0" elevation="12">
-                        Already
-                      </v-btn>
-                    </div>
-                    <div class="text-black top">
-                      <h1 class="mt-4">Dr. Irina Zabalotina</h1>
-                      <div>
-                        <p class="ma-0 text-body-1 font-weight-bold">Starting From $1600</p>
-                      </div>
-                    </div>
-                    <div class="d-flex justify-center">
-                      <v-btn v-for="(icon, index) in icons" :key="index" variant="text" :class="{ 'show-btns' : isHovering}" :color="transparent" :icon="icon"></v-btn>
-                    </div>
-                  </v-img>
-                  </v-card>
-                </v-hover>
-              </v-col>
-
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-col>
-      <v-col cols="12" sm="12">
-        <h1 class="text-center">Our Hospital</h1>
-        <v-row justify="center">
-          <v-col cols="12" sm="10">
-            <v-row>
-              <v-col cols="12" sm="3" v-for="(popular,i) in populars" :key="i">
-                <v-hover v-slot="{isHovering, props}">
-                <v-card class="mx-auto" color="grey-lighten-4" max-width="600" v-bind="props">
-                <v-img :aspect-ratio="16 /9" cover :src="popular.image">
-                <v-expand-transition>
-                  <div v-if="isHovering" class="d-flex transition-fast-in-fast-out bg-red-lighten-1 v-card--reveal" style="height: 100%">
-                  <v-row>
-                    <v-col cols="12" sm="12">
-                      <h1 class="ml-4">{{ popular.subtitle1 }}</h1>
-                    </v-col>
-                    <v-col cols="12" sm="12">
-                      <h6 class="ml-4 mt-n4 mb-3">
-                        {{ popular.subtitle2 }}
-                      </h6>
-                    </v-col>
-                  </v-row>
-                  </div>
-                </v-expand-transition>
-              </v-img>
-              <v-card-text class="pt-6">
-                <div class="font-weight-light text-grey text-h6 mb-2">
-                  {{ popular.title }}
-                </div>
-              </v-card-text>
-              <v-card-actions>
-                <span class="text-grey-darken-2 text-caption me-2">
-                  ({{ rating }})
-                </span>
-                <v-rating v-model="rating" color="white" active-color="yellow-accent-4" half-increments hover size="18"></v-rating>
-                <v-spacer></v-spacer>
-                <v-btn class="text-none" color="indigo-lighten-1" size="large" variant="flat" rounded="0" elevation="6">$1200</v-btn>
-              </v-card-actions>
-                </v-card>
-                </v-hover>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-col>
-      <v-col cols="12" sm="12">
-        <h1 class="text-center">Choose your service</h1>
-        <v-row justify="center">
-          <v-col cols="12" sm="10">
-            <v-row>
-              <v-col cols="12" sm="2" v-for="(offer, i) in offers" :key="i">
-                <v-card class="mx-auto px-2 pt-6" height="200px" flat>
-                  <div align="center" justify="center">
-                    <v-img :src="offer.image" height="100px" width="100px" cover></v-img>
-
-                  </div>
-                  <v-card-title class="text-center">
-                    <h6>{{ offer.title }}</h6>
-                  </v-card-title>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-col>
-      <v-col cols="12" sm="12">
-        <v-row justify="center">
-          <v-col cols="12" sm="10">
-            <v-row>
-              <v-col cols="12" sm="3" v-for="(hotel, i) in hotels" :key="i">
-              <v-hover v-slot="{isHovering,props}">
-                <v-card class="mx-auto" color="grey-lighten-4" max-width="600" v-bind="props">
-                <v-img :aspect-ratio="16 /9" cover :src="hospital.image">
-                  <v-expand-transition>
-                    <div v-if="isHovering" class="d-flex transition-fast-in-fast-out bg-teal-lighten-1 v-card--reveal" style="height: 100%;">
-                    <v-row>
-                      <v-col cols="12" sm="12">
-                        <h1 class="ml-4">{{ hospital.subtitle1 }}</h1>
-                      </v-col>
-                      <v-col cols="12" sm="12">
-                        <h6 class="ml-4 mt-n4 mb-3">
-                          {{ hospital.subtitle2 }}
-                        </h6>
-                      </v-col>
-                    </v-row>
-                    </div>
-                  </v-expand-transition>
-                </v-img>
-                <v-card-text class="pt-6">
-                  <div class="font-weight-light text-grey text-h6 mb-2">
-                    {{ hospital.title }}
-                  </div>
-                  <div class="font-weight-light text-caption">
-                    <v-icon color="indigo-lighten-1">
-mdi mdi-map-marker
-                    </v-icon> Bali, Indonesha
-                  </div>
-                </v-card-text>
-                <v-card-actions>
-                  <span class="text-grey-darken-2 text-caption me-2">({{ rating }})</span>
-                  <v-rating v-model="rating" color="white" active-color="yellow-accent-4" half-increments hover size="18">
-                  </v-rating>
-                  <v-spacer></v-spacer>
-                  <v-btn class="text-none" color="indigo-lighten-1" size="large" variant="flat" rounded="0" elevation="6">$1200</v-btn>
-                </v-card-actions>
-                </v-card>
-              </v-hover>
-            </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-col>
-      <!-- <v-col cols=12 sm="12">
-          <h1 class="text-center">Best Service Share a Smile</h1>
-          <v-sheet class="mx-auto" elevation="8" max-width="1200">
-            <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
-              <v-slide-group-item v-for="travel in travels" :key="travel" v-slot="{isSelected, toggle}">
-                <v-card :color="isSelected ? 'primary' : 'grey-lighten-1'" class="ma-4" height="200" width="130" @click="toggle" flat>
-                  <div class="d-flex fill-height align-center justify-center">
-                    <v-img :src="travel.image" cover height="100%" width="100%"></v-img>
-                  </div>
-                </v-card>
-              </v-slide-group-item>
-            </v-slide-group>
-          </v-sheet>
-      </v-col> -->
-      <v-col cols="12" sm="12">
-        <v-card>
-          <v-img src="/p.jpg" cover height="100%">
-            <div class="d-flex justify-center ligne1">
-              <h1>Sign up for our newsletter</h1>
+  <div class="container">
+    <div id="home" v-scroll-to="'#home'" class="bisnis">
+      <div class="text" data-aos="fade-right">
+        <h1>Welcome to</h1>
+        <h1>{{ business_name }}</h1>
+        <p>{{ business_desc }}</p>
+        <router-link to="/booking">
+          <button class="button">BOOKING</button>
+        </router-link>
+        <a :href="business_link_wa" target="_blank">
+          <button class="button-customer">
+            <i class="fab fa-whatsapp"></i> Contact Us
+          </button>
+        </a>
+      </div>
+      <div id="employe" v-scroll-to="'#employe'" class="cakupan" data-aos="fade-right">
+        <div class="judul-cakupan">
+          <h1>Cakupan</h1>
+        </div>
+        <div class="item">
+          <div v-for="scope in scopes" :key="scope.name" class="scope-item" data-aos="zoom-in">
+            <h2>{{ scope.scope_name }}</h2>
+            <p>{{ scope.scope_desc }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="teams" v-scroll-to="'#teams'" class="teams" data-aos="fade-left">
+      <div class="content-teams">
+        <h1>Daftar Pegawai</h1>
+        <swiper class="swiper-container" :slides-per-view="3" :space-between="30" :breakpoints="{
+          768: {
+            slidesPerView: 1
+          },
+          1024: {
+            slidesPerView: 4
+          }
+        }">
+          <swiper-slide v-for="member in teamMembers" :key="member.name" data-aos="flip-up">
+            <div class="team-card">
+              <img :src="member.image_url" alt="Team Member" />
+              <div class="team-info">
+                <h3>{{ member.name }}</h3>
+                <p>{{ member.position }}</p>
+              </div>
             </div>
-            <div class="d-flex justify-center ligne2">
-              <v-text-field density="compact" placeholder="Enter your e-main here" variant="solo-inverted" color="#393E50" rounded="0"></v-text-field>
-              <v-btn class="text-none tp" color="indigo-lighten-1" size="large" variant="flat" rounded="0" elevation="12">
-                Subscribe Now
-              </v-btn>
+          </swiper-slide>
+        </swiper>
+      </div>
+    </div>
+    <div id="product" v-scroll-to="'#product'" class="daftar-harga" data-aos="fade-up">
+      <div class="harga-content">
+        <h1>Daftar Product</h1>
+        <div class="price-cards">
+          <div class="price-card" v-for="(price, index) in priceList" :key="index" data-aos="flip-up">
+            <img :src="price.media_url" alt="Price Image" />
+            <h2>{{ price.name }}</h2>
+            <p>{{ price.description }}</p>
+            <div class="price">
+              <span>Rp {{ price.price }}</span>
             </div>
-          </v-img>
-        </v-card>
-      </v-col>
- </v-row>
-  </v-container>
-</v-main>
-<Footer />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="gallery" v-scroll-to="'#gallery'" class="gallery">
+      <div class="gallery-content">
+        <h1>Gambar</h1>
+        <div class="gallery-grid">
+          <a v-for="(image, index) in galleryImages" :key="index" :href="image.url" data-lightbox="gallery" :data-title="image.title">
+            <img :src="image.url" :alt="image.title" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <Footer />
 </template>
 
-<script>
-export default {
-  data: () => ({
-    tab: null,
-    model: null,
-    icons: ["mdi-rewind", "mdi-play", "mdi-fast-forward"],
-    transparent: "rgba(255, 255, 255, 0)",
-    rating: 4.5,
-    populars: [
-      {
-        image: "UZA Antwerp Hospital.jpg",
-        title: " UZA Antwerp Hospital",
-        subtitle1: "Belgia",
-        money: "$1200",
-      },
-      {
-        image: "European-Medical-Center-EMC.jpg",
-        title: " European-Medical-Center-EMC",
-        subtitle1: "Russia",
-        money: "$1300",
-      },
-      {
-        image: "HELIOS Hospital Schwerin.jpg",
-        title: " HELIOS Hospital Schwerin",
-        subtitle1: "West Mecklenburg",
-        money: "$900",
-      },
-      {
-        image: "Memorial Hospital.jpg",
-        title: " Memorial Hospital",
-        subtitle1: "Taiwan",
-        money: "$1700",
-      },
-    ],
-    offers: [
-      {
-        image: "i11.png",
-        title: "Dental crown",
-      },
-      {
-        image: "i12.png",
-        title: "Veneer",
-      },
-      {
-        image: "i13.png",
-        title: "Dental bridge",
-      },
-      {
-        image: "i14.png",
-        title: "Teeth whitening",
-      },
-      {
-        image: "i15.png",
-        title: "Braces",
-      },
-      {
-        image: "i16.png",
-        title: "Dental implants",
-      },
-    ],
-    hospital: [
-      {
-        image: "UZA Antwerp Hospital.jpg",
-        title: " UZA Antwerp Hospital",
-        subtitle1: "Belgia",
-        subtitle2: "4 Day's 3 Night",
-        money: "$2000",
-      },
-      {
-        image: "European-Medical-Center-EMC.jpg",
-        title: " European-Medical-Center-EMC",
-        subtitle1: "Russia",
-        subtitle2: "5 Day's 4 Night",
-        money: "$2000",
-      },
-      {
-        image: "HELIOS Hospital Schwerin.jpg",
-        title: " HELIOS Hospital Schwerin",
-        subtitle1: "West Mecklenburg",
-        subtitle2: "3 Day's 2 Night",
-        money: "$2000",
-      },
-      {
-        image: "Memorial Hospital.jpg",
-        title: " Memorial Hospital",
-        subtitle1: "Taiwan",
-        subtitle2: "4 Day's 3 Night",
-        money: "$2000",
-      },
-    ],
-    travels: [
-      {
-        image: "f1.jpg",
-      },
-      {
-        image: "f2.jpg",
-      },
-      {
-        image: "f3.jpg",
-      },
-      {
-        image: "f4.jpg",
-      },
-      {
-        image: "f5.jpg",
-      },
-      {
-        image: "f6.jpg",
-      },
-      {
-        image: "5.jpg",
-      },
-      {
-        image: "8.jpg",
-      },
-    ],
-  }),
-};
-</script>
 <style scoped>
-.title1 {
-  color: #1f3347;
-  font-size: 50px;
-  font-style: bold;
-  margin-left: 100px;
-  margin-top: 70px;
-}
-.par1 {
-  color: "#AAA1B4";
-  margin-left: 100px;
-}
-.bt1 {
-  margin-left: 100px;
-}
-.img1 {
-  width: 1000px !important;
-  height: 1000px !important;
-  z-index: 1;
-  margin-top: -200px;
-}
-.v-card.card1 {
-  transition: opacity 0.4s ease-in-out;
+.bisnis {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: end;
+  height: 114vh;
+  background-image: url('/public/bg-rs.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
 }
 
-.v-card.card1:not(.on-hover) {
-  opacity: 0.6;
-}
-
-.show-btns {
-  color: rgba(255, 255, 255, 1) !important;
-}
-.top {
-  margin-top: 100%;
-  margin-left: 20px;
-}
-.v-card--reveal {
-  align-items: end;
-  bottom: 0;
-  justify-content: start;
-  opacity: 0.9;
+.bisnis::before {
+  content: "";
   position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
-.ligne1 {
-  margin-top: 150px;
+
+.bisnis .text {
+  z-index: 2;
+  color: white;
+  margin-bottom: 0rem;
+  padding: 20px;
 }
-.ligne2 {
-  margin-top: 10px;
-  padding: 0 250px 0 250px;
+
+.bisnis .cakupan {
+  transform: translateY(50%);
+  z-index: 10;
+  color: white;
+  background-color: rgb(93, 93, 247);
+  height: 47%;
+  width: 95%;
 }
-.tp {
-  margin-top: -2px;
+
+.teams {
+  margin-top: 220px;
+  margin-bottom: 70px;
+  padding: 20px;
+}
+
+.button {
+  background-color: blue;
+  margin: 20px;
+  height: 50px;
+  width: 150px;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+}
+
+.button-customer {
+  background-color: rgb(0, 166, 14);
+  margin: 20px;
+  height: 50px;
+  width: 150px;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+}
+
+.content-teams {
+  text-align: center;
+}
+
+.content-teams h1 {
+  margin-bottom: 20px;
+}
+
+.team-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 250px;
+  height: 350px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.team-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.team-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.judul-cakupan h1 {
+  text-align: center;
+}
+
+.team-info {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.daftar-harga {
+  text-align: center;
+  padding: 50px 20px;
+  background-color: rgb(93, 93, 247);
+}
+
+.harga-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.price-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.price-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  padding: 20px;
+  width: 250px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.price-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 15px;
+}
+
+.price-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.price-card h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.price-card p {
+  font-size: 1em;
+  margin-bottom: 20px;
+}
+
+.price-card .price {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.team-info h3,
+.team-info p {
+  margin: 0;
+}
+
+.daftar-harga {
+  text-align: center;
+}
+
+.cakupan-list {
+  padding: 20px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.scope-item {
+  margin: 20px;
+  margin-bottom: 20px;
+}
+
+.scope-item h2 {
+  text-align: center;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+
+.gallery {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.gallery-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.gallery-grid a {
+  flex: 1 1 calc(25% - 20px);
+  box-sizing: border-box;
+  display: block;
+  margin: 10px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.gallery-grid img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.gallery-grid a:hover img {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.scope-item p {
+  font-size: 1em;
+}
+
+
+@media (max-width: 768px) {
+  .bisnis {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .bisnis .text {
+    max-width: 100%;
+  }
+
+  .cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  .price-card {
+    width: 100%;
+    margin: 10px 0;
+  }
 }
 </style>
+

@@ -1,0 +1,248 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+  
+  .nav {
+    display: flex;
+    align-items: center;
+    padding: 20px 35px;
+    justify-content: space-between;
+    background-color: #f8f8f8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .nav span {
+    font-size: 30px;
+    font-weight: bold;
+    color: orange;
+  }
+  
+  .nav .site {
+    color: #70c2e3;
+  }
+  
+  .nav .button {
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav button {
+    color: white;
+    font-weight: bold;
+    background-color: #333;
+    height: 40px;
+    width: 100px;
+    border-radius: 5px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .nav button:hover {
+    background-color: #666;
+  }
+  
+  .main {
+    padding: 35px;
+  }
+  
+  .main h1 {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .search-container {
+    display: flex;
+  }
+  
+  .search-container input {
+    width: 300px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease; /* Add a transition effect */
+  }
+  
+  .search-container input:focus {
+    border-color: blue; /* Change the border color to blue when focused */
+    outline: none; /* Remove the default outline */
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  th, td {
+    padding: 15px;
+    text-align: left;
+    border: none;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #555;
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .main button {
+    background-color: #4caf50;
+    color: white;
+    height: 40px;
+    width: 110px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .main button:hover {
+    background-color: #45a049;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .pagination span {
+    padding: 5px 10px;
+    border: none;
+    background-color: transparent;
+    color: black;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .pagination span.disabled {
+    color: grey;
+    cursor: not-allowed;
+  }
+  
+  .pagination span.active {
+    font-weight: bold;
+    color: #4caf50;
+  }
+  
+  .content-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .content-input .booking {
+    background-color: rgb(101, 101, 255);
+    height: 40px;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 500px;
+    height: 500px;
+    overflow-y: scroll;
+    max-width: 90%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease-out;
+  }
+  
+  @keyframes slideDown {
+    from {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .modal-content {
+    position: relative;
+  }
+  
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .close:hover {
+    color: red;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease;
+  }
+  
+  input:focus, select:focus {
+    border-color: blue;
+    outline: none;
+  }
+  
+  button[type="submit"] {
+    background-color: #4caf50;
+    color: white;
+    height: 40px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #45a049;
+  }

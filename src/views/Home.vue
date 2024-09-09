@@ -101,7 +101,7 @@ const fetchGalleryData = async (uuidBisnis) => {
 };
 
 onMounted(async () => {
-  const uuidBisnis = '97214164-920a-4ac7-8d53-538fd535f36a';
+  const uuidBisnis = 'de381843-8d2e-44fd-8294-e6d1eb2f2940';
   await getDetailUuid(uuidBisnis);
   await fetchScopeData(uuidBisnis);
   await fetchTeamsData(uuidBisnis);

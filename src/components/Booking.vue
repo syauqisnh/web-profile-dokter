@@ -68,7 +68,7 @@ const updateOptions = () => {
 
 const fetchDataOption = async () => {
   try {
-    const getBusines = await axios.get(`http://localhost:9900/api/v1/business_customer/23644b20-f4fc-4000-9762-047c976897bc`);
+    const getBusines = await axios.get(`http://localhost:9900/api/v1/business_customer/c8b749b6-54fb-4498-b6e7-157f951d4635`);
     DataBusiness.value = getBusines.data.data;
     const getTime = await axios.get(`http://localhost:9900/api/v1/practice/get_all`);
     DataBusiness.value = getBusines.data.data;
@@ -103,7 +103,7 @@ const fetchScheduleData = async () => {
   }
   
   try {
-    const response = await axios.get(`http://localhost:9900/api/v1/practice_business/97214164-920a-4ac7-8d53-538fd535f36a`, {
+    const response = await axios.get(`http://localhost:9900/api/v1/practice_business/de381843-8d2e-44fd-8294-e6d1eb2f2940`, {
       params: params
     });
     scheduleData.value = response.data.data;
@@ -117,7 +117,7 @@ const fetchScheduleData = async () => {
 
 const fetchBookingData = async () => {
   try {
-    const response = await axios.get('http://localhost:9900/api/v1/schedule_business/97214164-920a-4ac7-8d53-538fd535f36a');
+    const response = await axios.get('http://localhost:9900/api/v1/schedule_business/de381843-8d2e-44fd-8294-e6d1eb2f2940');
     antrianData.value = response.data.data;
   } catch (error) {
     console.error('Error fetching booking data:', error);

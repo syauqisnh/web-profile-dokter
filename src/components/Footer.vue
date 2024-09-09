@@ -33,7 +33,7 @@ const getDetailUuid = async (uuidBisnis) => {
 };
 
 onMounted(async () => {
-  const uuidBisnis = 'dc7101b8-6687-4fc3-a69f-bafdb42fe9d5';
+  const uuidBisnis = 'de381843-8d2e-44fd-8294-e6d1eb2f2940';
   await getDetailUuid(uuidBisnis);
 });
 </script>
